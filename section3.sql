@@ -7,14 +7,14 @@
 
 go
 create PROCEDURE AddNewBookUpdateAuthorAveragePrice1
-    @book_id INT,
-    @title VARCHAR(50),
-    @authorid INT,
-    @genre VARCHAR(50),
-    @price DECIMAL(10, 2)
+  @book_id INT,
+  @title VARCHAR(50),
+  @authorid INT,
+  @genre VARCHAR(50),
+  @price DECIMAL(10, 2)
 AS
 BEGIN
-    BEGIN TRY
+  BEGIN TRY
         IF @price <= 0
         BEGIN
             THROW 60000, 'Price must be positive', 1;
@@ -23,25 +23,25 @@ BEGIN
         BEGIN TRANSACTION;
 
         INSERT INTO books
-        (book_id, title, author_id, genre, price)
-    VALUES
-        (@book_id, @title, @authorid, @genre, @price);
+    (book_id, title, author_id, genre, price)
+  VALUES
+    (@book_id, @title, @authorid, @genre, @price);
 
         -- Calculate new average price
         DECLARE @average_price DECIMAL(10, 2);
         SELECT @average_price = AVG(price)
-    FROM books
-    where author_id = @authorid
+  FROM books
+  where author_id = @authorid
         COMMIT TRANSACTION;
         SELECT @average_price AS average_price; -- Return the new average price
     END
-    TRY
+  TRY
     BEGIN CATCH
-    ROLLBACK TRANSACTION;
-    PRINT CONCAT('Error number is: ', ERROR_NUMBER());
-    PRINT CONCAT('Error message is: ', ERROR_MESSAGE());
-    PRINT CONCAT('Error state is: ', ERROR_STATE());
-    END CATCH
+  ROLLBACK TRANSACTION;
+  PRINT CONCAT('Error number is: ', ERROR_NUMBER());
+  PRINT CONCAT('Error message is: ', ERROR_MESSAGE());
+  PRINT CONCAT('Error state is: ', ERROR_STATE());
+  END CATCH
 END
 
 EXEC AddNewBookUpdateAuthorAveragePrice1
@@ -57,44 +57,44 @@ EXEC AddNewBookUpdateAuthorAveragePrice1
 
 go
 alter PROC deletesABookUpdatesAuthorsTotal
-    @bookid int
+  @bookid int
 AS
 Begin
-    begin TRY
+  begin TRY
     begin TRANSACTION
       if not exists(select @bookid
-    from books)
+  from books)
    BEGIN
       throw 60000, 'book is not found to delete', 1
    end
 
    if exists (select *
-    from sales
-    where book_id = @bookid)
+  from sales
+  where book_id = @bookid)
    BEGIN
-        delete from sales where book_id = @bookid
-    End
+    delete from sales where book_id = @bookid
+  End
    delete from books
    where book_id = @bookid
 
 commit TRANSACTION
 
    select a.author_id, sum(s.total_amount) as total
-    from sales s
-        join books b
-        on b.book_id = s.book_id
-        join authors a
-        on a.author_id = b.author_id
-    group by a.author_id
+  from sales s
+    join books b
+    on b.book_id = s.book_id
+    join authors a
+    on a.author_id = b.author_id
+  group by a.author_id
     -- having b.book_id = @bookid
   end
-    TRY
+  TRY
   BEGIN CATCH
-    ROLLBACK TRANSACTION;
-    PRINT CONCAT('Error number is: ', ERROR_NUMBER());
-    PRINT CONCAT('Error message is: ', ERROR_MESSAGE());
-    PRINT CONCAT('Error state is: ', ERROR_STATE());
-    END CATCH
+  ROLLBACK TRANSACTION;
+  PRINT CONCAT('Error number is: ', ERROR_NUMBER());
+  PRINT CONCAT('Error message is: ', ERROR_MESSAGE());
+  PRINT CONCAT('Error state is: ', ERROR_STATE());
+  END CATCH
 
 end
 go
@@ -110,28 +110,28 @@ from books
 
 go
 alter proc TransferBookSalestoAnotherBook
-    @bookid1 INT,
-    @bookid2 int
+  @bookid1 INT,
+  @bookid2 int
 AS
 BEGIN
 
-    declare @book1TotalSales decimal(10,2)
-    declare @book2TotalSales decimal(10,2)
-    BEGIN TRY
+  declare @book1TotalSales decimal(10,2)
+  declare @book2TotalSales decimal(10,2)
+  BEGIN TRY
     begin transaction
     if not exists (select @bookid1, @bookid2
-    from sales)
+  from sales)
     BEGIN
     throw 2000, 'book not found', 1
     END 
 
     select @book1TotalSales = total_amount
-    from sales
-    where book_id = @bookid1
+  from sales
+  where book_id = @bookid1
 
     select @book2TotalSales = total_amount
-    from sales
-    where book_id = @bookid2
+  from sales
+  where book_id = @bookid2
 
     update sales 
     set Total_amount = total_amount+ @book1TotalSales
@@ -143,16 +143,16 @@ BEGIN
    
    commit TRANSACTION 
    select book_id, total_amount
-    from sales
-    where book_id in (@bookid1, @bookid2)
+  from sales
+  where book_id in (@bookid1, @bookid2)
   end
-    TRY
+  TRY
   begin CATCH
-    ROLLBACK TRANSACTION;
-    print concat ('error number is' , Error_number());
-    print concat ('error message is' , ERROR_MESSAGE());
-    print concat ('error state is' , ERROR_STATE());
-    end CATCH
+  ROLLBACK TRANSACTION;
+  print concat ('error number is' , Error_number());
+  print concat ('error message is' , ERROR_MESSAGE());
+  print concat ('error state is' , ERROR_STATE());
+  end CATCH
 end
 
 exec TransferBookSalestoAnotherBook @bookid1 =9, @bookid2 =4
@@ -162,25 +162,25 @@ exec TransferBookSalestoAnotherBook @bookid1 =9, @bookid2 =4
 
 go
 create proc AddSaleandUpdateBookQuantity
-    @saleid int ,
-    @bookid int ,
-    @saledate date ,
-    @quantity int,
-    @totalAmount decimal(10,2)
+  @saleid int ,
+  @bookid int ,
+  @saledate date ,
+  @quantity int,
+  @totalAmount decimal(10,2)
 AS
 BEGIN
 
-    DECLARE @newTotalSales int
-    BEGIN TRY 
+  DECLARE @newTotalSales int
+  BEGIN TRY 
       begin TRANSACTION
         if @quantity <=0 
           BEGIN
             throw 60000, 'quantity cannot be negative',1
           END
     insert into sales
-        (sale_id, book_id, sale_date, quantity, total_amount)
-    values
-        ( @saleid, @bookid, @saledate, @quantity, @totalAmount)
+    (sale_id, book_id, sale_date, quantity, total_amount)
+  values
+    ( @saleid, @bookid, @saledate, @quantity, @totalAmount)
 
     update sales 
     set quantity =quantity+ @quantity
@@ -188,16 +188,16 @@ BEGIN
     commit TRANSACTION 
 
     select @newTotalSales = quantity
-    from sales
-    where book_id = @bookid 
+  from sales
+  where book_id = @bookid 
 
     select @newTotalSales as newtotalquantity
 
     END
-    TRY
+  TRY
     begin CATCH
-    ROLLBACK;
-    END Catch
+  ROLLBACK;
+  END Catch
 END
 -- drop procedure AddSaleandUpdateBookQuantity
 exec AddSaleandUpdateBookQuantity 
@@ -223,12 +223,12 @@ from Books
 
 go
 create proc RecalculateAuthorsAveragePrice
-    @bookid int,
-    @bookprice decimal(10,2),
-    @authorid int
+  @bookid int,
+  @bookprice decimal(10,2),
+  @authorid int
 AS
 BEGIN
-    BEGIN try 
+  BEGIN try 
       BEGIN TRANSACTION 
          if @bookprice < = 0
            BEGIN
@@ -242,15 +242,15 @@ BEGIN
       declare @AuthorAverage decimal(10,2)
   
       select @AuthorAverage=  avg(price)
-    from books
-    where author_id = @authorid
+  from books
+  where author_id = @authorid
      
       select @AuthorAverage as newaverage
     END
-    TRY
+  TRY
     begin CATCH
-    ROLLBACK;
-    END CATCH
+  ROLLBACK;
+  END CATCH
 END
 
 exec RecalculateAuthorsAveragePrice  @bookid = 2,
