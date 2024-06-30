@@ -53,7 +53,7 @@ VALUES
     (7, 'True beauty', 2, 'Romance', 20.76),
     (8, ' secretery kim', 3, 'Romance', 17.56),
     (9, 'sofia', 4, 'fantasy', 12.67),
-    (10, 'Little Things', 5, 'Romance', 12.50)
+    (10, 'Hometown cha cha', 5, 'Dystopian', 20.67)
 
 ;
 
@@ -68,7 +68,10 @@ VALUES
     (6, 6, '2024-06-27', 5, 98.89),
     (7, 7, '2024-01-27', 5, 103.8),
     (8, 8, '2024-01-27', 2, 36.9),
-    (9, 9, '2024-02-23', 1, 12.67),
+    (9, 9, '2024-02-23', 1, 12.67)
+,
+insert into sales
+values
     (10, 10, '2024-04-27', 2, 25.54);
 
 
@@ -239,7 +242,7 @@ where rank <=3
 -- Task 8: Stored Procedure for Top-Selling Book in a Genre
 -- Create a stored procedure to get the top-selling book in a specific genre and write a query to call the procedure for 'Fantasy'.
 go
-alter proc TopSellingBookinaGenre
+create proc TopSellingBookinaGenre
     @genre varchar(50)
 AS
 BEGIN
