@@ -6,7 +6,7 @@
 --Ensure the price is positive, use transactions to ensure data integrity, and return the new average price.
 
 go
-create PROCEDURE AddNewBookUpdateAuthorAveragePrice1
+alter PROCEDURE AddNewBookUpdateAuthorAveragePrice1
   @book_id INT,
   @title VARCHAR(50),
   @authorid INT,
@@ -15,12 +15,13 @@ create PROCEDURE AddNewBookUpdateAuthorAveragePrice1
 AS
 BEGIN
   BEGIN TRY
+  BEGIN TRANSACTION;
         IF @price <= 0
-        BEGIN
-            THROW 60000, 'Price must be positive', 1;
-        END
         
-        BEGIN TRANSACTION;
+            THROW 60000, 'Price must be positive', 1;
+        
+        
+        
 
         INSERT INTO books
     (book_id, title, author_id, genre, price)
@@ -28,12 +29,12 @@ BEGIN
     (@book_id, @title, @authorid, @genre, @price);
 
         -- Calculate new average price
-        DECLARE @average_price DECIMAL(10, 2);
-        SELECT @average_price = AVG(price)
+    
+    SELECT AVG(price)
   FROM books
   where author_id = @authorid
         COMMIT TRANSACTION;
-        SELECT @average_price AS average_price; -- Return the new average price
+         -- Return the new average price
     END
   TRY
     BEGIN CATCH
@@ -45,11 +46,11 @@ BEGIN
 END
 
 EXEC AddNewBookUpdateAuthorAveragePrice1
-         @book_id = 10,
+         @book_id = 13,
     @title = 'Hometown cha cha',
     @authorid = 5,
     @genre = 'Dystopian',
-    @price = 20.67;
+    @price = 21.67;
 
 -- Delete Book and Update Author's Total Sales
 -- Create a stored procedure that deletes a book and updates the author's total sales. 

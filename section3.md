@@ -32,8 +32,8 @@ END
         (@book_id, @title, @authorid, @genre, @price);
 
         -- Calculate new average price
-        DECLARE @average_price DECIMAL(10, 2);
-        SELECT @average_price = AVG(price)
+
+        SELECT AVG(price)
     FROM books
     where author_id = @authorid
 
@@ -53,14 +53,14 @@ END
 END
 
 EXEC AddNewBookUpdateAuthorAveragePrice1
-@book_id = 10,
-@title = 'Game of Thrones',
+@book_id = 11,
+@title = 'Hometown ch cha',
 @authorid = 6,
 @genre = 'Fiction',
 @price = 12.67;
 ```
 
-![alt text](image-22.png)
+![alt text](image-42.png)
 
 ### Task 2
 
