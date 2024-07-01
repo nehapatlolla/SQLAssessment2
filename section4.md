@@ -154,14 +154,28 @@ for xml path('Content'), root('Authors')
 
 - Write a query to export the authors and their books as JSON.
   ```sql
-  select a.author_id , a.name, b.title
-   from authors a
-       join books b
-       on b.author_id = a.author_id
-   group by a.name,a.author_id ,b.title
-   for json path
+     SELECT
+    a.author_id,
+    a.name AS author_name,
+    a.country,
+    a.birth_year,
+    JSON_QUERY((
+        SELECT
+            b.book_id,
+            b.title,
+            b.genre,
+            b.price
+        FROM
+            books b
+        WHERE
+            b.author_id = a.author_id
+        FOR JSON PATH
+    )) AS books
+   FROM
+       authors a
+  FOR JSON PATH, ROOT('authors');
   ```
-  ![alt text](image-37.png)
+  ![alt text](image-45.png)
 
 ### Task 8
 

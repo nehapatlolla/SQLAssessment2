@@ -104,25 +104,28 @@ for xml path('Content'), root('Authors')
 
     -- Export Data as JSON
     -- Write a query to export the authors and their books as JSON.
-    select a.author_id , a.name, b.title
-    from authors a
-        join books b
-        on b.author_id = a.author_id
-    group by a.name,a.author_id ,b.title
-    for json path
 
-    --     select a.author_id , a.name, (select b.title as book1
-    --         from books b
-    --         where b.author_id = a.author_id
-    -- )
-    --     from authors a
-    --         join books b
-    --         on b.author_id = a.author_id
-    --     group by a.name,a.author_id ,b.title
-    --     for json path
+    SELECT
+        a.author_id,
+        a.name AS author_name,
+        a.country,
+        a.birth_year,
+        JSON_QUERY((
+        SELECT
+            b.book_id,
+            b.title,
+            b.genre,
+            b.price
+        FROM
+            books b
+        WHERE
+            b.author_id = a.author_id
+        FOR JSON PATH
+    )) AS books
+    FROM
+        authors a
+    FOR JSON PATH, ROOT('authors');
 
-    --         for JSON path
-    --         ('new')
 
 -- Scalar Function for Total Sales in a Year
 -- Create a scalar function that returns the total sales amount in a given year and use it in a query to display the total sales for 2024.
